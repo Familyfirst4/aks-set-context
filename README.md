@@ -34,6 +34,15 @@ You must run [Azure/login](https://github.com/Azure/login) before this action.
     <td><code>use-kubelogin</code></td>
     <td>Allows non-admin users to use the Action via kubelogin</td>
   </tr>
+  <tr>
+    <td><code>public-fqdn</code></td>
+    <td>Get private cluster credential with server address to be public fqdn</td>
+  </tr>
+  <tr>
+    <td><code>resource-type</code></td>
+    <td>Microsoft.ContainerService/managedClusters (default) or Microsoft.ContainerService/fleets</td>
+  </tr>
+
 </table>
 
 ## Example
@@ -41,13 +50,13 @@ You must run [Azure/login](https://github.com/Azure/login) before this action.
 ### OIDC Authentication (recommended)
 
 ```yaml
-- uses: azure/login@v1
+- uses: azure/login@v2
   with:
      client-id: ${{ secrets.AZURE_CLIENT_ID }}
      tenant-id: ${{ secrets.AZURE_TENANT_ID }}
      subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
-- uses: azure/aks-set-context@v2
+- uses: azure/aks-set-context@v4
   with:
      resource-group: '<resource group name>'
      cluster-name: '<cluster name>'
@@ -56,11 +65,11 @@ You must run [Azure/login](https://github.com/Azure/login) before this action.
 ### Service Principal Authentication
 
 ```yaml
-- uses: azure/login@v1
+- uses: azure/login@v2
   with:
      creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-- uses: azure/aks-set-context@v2
+- uses: azure/aks-set-context@v4
   with:
      resource-group: '<resource group name>'
      cluster-name: '<cluster name>'
@@ -70,29 +79,29 @@ You must run [Azure/login](https://github.com/Azure/login) before this action.
 
 `kubelogin` is at the core of the non-admin user scenario. For more information on `kubelogin`, refer to the documentation [here](https://github.com/Azure/kubelogin).
 
-To run this Action as a non-admin user, you must first install `kubelogin`. To set up `kubelogin`, you may use the following:
+To run this Action as a non-admin user, you must first install `kubelogin`. To set up `kubelogin`, you may use the action [azure/use-kubelogin][action_use_kubelogin]:
 
 ```yaml
 - name: Set up kubelogin for non-interactive login
-        run: |
-          curl -LO https://github.com/Azure/kubelogin/releases/download/v0.0.9/kubelogin-linux-amd64.zip
-          sudo unzip -j kubelogin-linux-amd64.zip -d /usr/local/bin
-          rm -f kubelogin-linux-amd64.zip
-          kubelogin --version
+  uses: azure/use-kubelogin@v2
+  with:
+     kubelogin-version: 'v0.0.24'
 ```
+
+[action_use_kubelogin]: https://github.com/marketplace/actions/setup-kubelogin
 
 ### Non-Admin User Example
 
 If you are executing this Action as a non-admin user, you need to toggle the optional `use-kubelogin` Action input to `true` for it to work.
 
 ```yaml
-- uses: azure/login@v1
+- uses: azure/login@v2
   with:
      client-id: ${{ secrets.AZURE_CLIENT_ID }}
      tenant-id: ${{ secrets.AZURE_TENANT_ID }}
      subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
-- uses: azure/aks-set-context@v2
+- uses: azure/aks-set-context@v4
   with:
      resource-group: '<resource group name>'
      cluster-name: '<cluster name>'
@@ -101,11 +110,11 @@ If you are executing this Action as a non-admin user, you need to toggle the opt
 ```
 
 ```yaml
-- uses: azure/login@v1
+- uses: azure/login@v2
   with:
      creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-- uses: azure/aks-set-context@v2
+- uses: azure/aks-set-context@v4
   with:
      resource-group: '<resource group name>'
      cluster-name: '<cluster name>'
@@ -126,3 +135,7 @@ provided by the bot. You will only need to do this once across all repos using o
 This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/).
 For more information see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/) or
 contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additional questions or comments.
+
+## Support
+
+aks-set-context is an open source project that is [**not** covered by the Microsoft Azure support policy](https://support.microsoft.com/en-us/help/2941892/support-for-linux-and-open-source-technology-in-azure). [Please search open issues here](https://github.com/Azure/aks-set-context/issues), and if your issue isn't already represented please [open a new one](https://github.com/Azure/aks-set-context/issues/new/choose). The project maintainers will respond to the best of their abilities.
